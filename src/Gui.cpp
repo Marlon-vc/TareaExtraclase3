@@ -8,15 +8,22 @@
 #include <thread>
 #include <iostream>
 
-typedef void *(*THREADFUNCPTR)(void *);
+enum tipo{
+    JUGADOR,
+    OBSTACULO,
+    OBJETIVO,
+    VACIO
+};
 
 class Game: public Gtk::Window {
     public:
         Game();
         virtual ~Game();
     private:
-        Gtk::Button button1;
-        Gtk::Box container;
+        bool running = false;
+        tipo matrix[20][20] = {VACIO};
+        int min_div = 10;
+    
         Gtk::Fixed plane;
         Gtk::Image cat;
 
@@ -24,41 +31,32 @@ class Game: public Gtk::Window {
         void startThread();
 };
 
-Game::Game(): button1("start"), container(Gtk::ORIENTATION_VERTICAL){
-
-    // container.put();
-    // container.move();
+Game::Game() {
 
     Glib::RefPtr<Gdk::Pixbuf> pix = Gdk::Pixbuf::create_from_file("/home/marlon/TEC/II Semestre 2019/Datos II/TareaExtraclase3/res/cat.png", 20, 20);
     cat = Gtk::Image(pix);
 
     plane.put(cat, 250, 150);
-    plane.show_all_children();
 
-    button1.signal_clicked().connect(sigc::mem_fun(*this, &Game::startThread));
-
-    container.add(plane);
-    container.add(button1);
-    add(container);
+    add(plane);
 
     set_size_request(500, 500);
     set_title("Pathfinding Game");
     show_all_children();
-    
+    startThread();
 }
-
 Game::~Game() {
 
 }
 void Game::startThread() {
-    // pthread_t thread;
-    // int rc;
-    // rc = pthread_create(&thread, NULL, (THREADFUNCPTR) &Game::move, this);
-    // if (rc) {
-    //     std::cout << "Unable to start thread..\n";
-    // }
-    std::thread my_thread(move);
-    
+    // std::thread my_thread(&Game::move, this);
+    std::thread my_thread(foo);
+    my_thread.detach();
+    // my_thread.join();
+}
+
+void foo() {
+
 }
 
 void Game::move() {
@@ -67,8 +65,10 @@ void Game::move() {
     int y = 0;
     while (true) {
         plane.move(cat, x, y);
-        x++;
+         x++;
         y++;
+        std::cout << "Moved..\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(150));
     }
 }
 
