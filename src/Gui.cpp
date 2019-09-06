@@ -20,23 +20,25 @@ class Game: public Gtk::Window {
         Game();
         virtual ~Game();
     private:
+        const static int resolution = 20;
         bool running = false;
-        tipo matrix[20][20] = {VACIO};
-        int min_div = 10;
+        tipo matrix[resolution][resolution] = {VACIO};
+        int min_div;
+
+        int player_x;
+        int player_y;
     
         Gtk::Fixed plane;
-        Gtk::Image cat;
+        Gtk::Image player;
 
         void move();
         void startThread();
+        void placePlayer();
+        Glib::RefPtr<Gdk::Pixbuf> load_image(std::string path, int width, int height);
 };
 
 Game::Game() {
-
-    Glib::RefPtr<Gdk::Pixbuf> pix = Gdk::Pixbuf::create_from_file("/home/marlon/TEC/II Semestre 2019/Datos II/TareaExtraclase3/res/cat.png", 20, 20);
-    cat = Gtk::Image(pix);
-
-    plane.put(cat, 250, 150);
+    player = Gtk::Image(load_image("/home/marlon/TEC/II Semestre 2019/Datos II/TareaExtraclase3/res/cat.png", 20, 20));
 
     add(plane);
 
@@ -49,27 +51,29 @@ Game::~Game() {
 
 }
 void Game::startThread() {
-    // std::thread my_thread(&Game::move, this);
-    std::thread my_thread(foo);
+    running = true;
+    std::thread my_thread(&Game::move, this);    
     my_thread.detach();
-    // my_thread.join();
 }
-
-void foo() {
-
+void Game::placePlayer() {
+    srand(500);
+    player_x = rand();
+    player_y = rand();
+    plane.put(player, player_x, player_y);
+    std::cout << "Player coordinates:\nX: " << player_x << "\tY: " << player_y << "\n";
 }
-
 void Game::move() {
-    std::cout << "Moving\n";
-    int x = 0;
-    int y = 0;
-    while (true) {
-        plane.move(cat, x, y);
-         x++;
-        y++;
-        std::cout << "Moved..\n";
+    std::cout << "Starting movement..\n";
+    while (running) {
+        plane.move(player, player_x, player_y);
+        player_x++;
+        player_y++;
+        std::cout << "Moved\n";
         std::this_thread::sleep_for(std::chrono::milliseconds(150));
     }
+}
+Glib::RefPtr<Gdk::Pixbuf> Game::load_image(std::string path, int width, int height) {
+    return Gdk::Pixbuf::create_from_file(path, width, height);
 }
 
 int main(int argc, char *argv[]) {
