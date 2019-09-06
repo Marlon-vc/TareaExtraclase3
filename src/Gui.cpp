@@ -36,7 +36,7 @@ class Game: public Gtk::Window {
         void placePlayer();
         Glib::RefPtr<Gdk::Pixbuf> load_image(std::string path, int width, int height);
 };
-
+ 
 Game::Game() {
     player = Gtk::Image(load_image("/home/marlon/TEC/II Semestre 2019/Datos II/TareaExtraclase3/res/cat.png", 20, 20));
 
