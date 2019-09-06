@@ -48,7 +48,6 @@ Game::Game() {
     startThread();
 }
 Game::~Game() {
-
 }
 void Game::startThread() {
     running = true;
