@@ -10,6 +10,10 @@
 #include <random>
 #include "sprite.cpp"
 
+
+//g++ archivo.cpp -o out/output `pkg-config gtkmm-3.0 --cflags --libs` -pthread
+
+
 class Game: public Gtk::Window {
     public:
         Game();
@@ -41,8 +45,8 @@ class Game: public Gtk::Window {
 };
  
 Game::Game(): eng(rd()), dist(0, resolution) {
-    player.img = Gtk::Image(load_image("/home/marlon/TEC/II Semestre 2019/Datos II/TareaExtraclase3/res/cat.png", 20, 20));
-    target.img = Gtk::Image(load_image("/home/marlon/TEC/II Semestre 2019/Datos II/TareaExtraclase3/res/target.png", 20, 20));
+    player.img = Gtk::Image(load_image("/home/steven/Desktop/TareaExtraclase3/res/cat.png", 20, 20));
+    target.img = Gtk::Image(load_image("/home/steven/Desktop/TareaExtraclase3/res/target.png", 20, 20));
     add(plane);
     set_size_request(WIDTH, HEIGHT);
     set_title("Pathfinding Game");
@@ -85,26 +89,53 @@ void Game::placePlayer() {
 void Game::move() {
     std::cout << "Starting movement..\n";
 
-    bool up;
-    bool left;
-
-    if (target.matrix_x < player.matrix_x) {
-        left = true;
-    } else {
-        left = false;
-    }
-
-    if (target.matrix_y < player.matrix_y) {
-        up = false;
-    } else {
-        up = true;
-    }
+    bool check;
 
     while (running) {
 
-        plane.move(player.img, player.gui_x, player.gui_y);
-        player.move(player.matrix_x + 1, player.matrix_y + 1);
-        std::this_thread::sleep_for(std::chrono::milliseconds(600));
+        if(target.matrix_x != player.matrix_x){
+
+            if (target.matrix_x < player.matrix_x){
+                plane.move(player.img, player.gui_x, player.gui_y);
+                player.move(player.matrix_x -1, player.matrix_y);
+                std::cout << "Player coordinates:\nX: " << player.matrix_x << "\tY: " << player.matrix_y << "\n";
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                
+            } else {
+
+                plane.move(player.img, player.gui_x, player.gui_y);
+                player.move(player.matrix_x +1, player.matrix_y);
+                std::cout << "Player coordinates:\nX: " << player.matrix_x << "\tY: " << player.matrix_y << "\n";
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
+        }
+
+        if (target.matrix_y != player.matrix_y){
+
+            if (target.matrix_y < player.matrix_y) {
+                plane.move(player.img, player.gui_x, player.gui_y);
+                player.move(player.matrix_x, player.matrix_y - 1);
+                std::cout << "Player coordinates:\nX: " << player.matrix_x << "\tY: " << player.matrix_y << "\n";
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+            } else {
+
+                plane.move(player.img, player.gui_x, player.gui_y);
+                player.move(player.matrix_x, player.matrix_y + 1);
+                std::cout << "Player coordinates:\nX: " << player.matrix_x << "\tY: " << player.matrix_y << "\n";
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
+        }
+
+
+        if ((target.matrix_x == player.matrix_x) && (target.matrix_y == player.matrix_y)){
+            if (check == true){
+                std::cout<< "::::::::::::::Objetivo alcanzado::::::::::::::\n";  
+                check = false; 
+            }
+            
+        }
+
     }
 }
 
@@ -113,7 +144,7 @@ void Game::generateObstacles() {
     for (int i=0; i < obstacle_count; i++) {
         std::cout << "Sprite " << i << "\n";
         Sprite *obs = new Sprite();
-        obs->img = Gtk::Image(load_image("/home/marlon/TEC/II Semestre 2019/Datos II/TareaExtraclase3/res/obstacle.png", 20, 20));
+        obs->img = Gtk::Image(load_image("/home/steven/Desktop/TareaExtraclase3/res/obstacle.png", 20, 20));
         obs->set_matrix_coords(dist(eng), dist(eng));
         obs->set_gui_coords(min_div);
         plane.put(obs->img, obs->gui_x, obs->gui_y);
